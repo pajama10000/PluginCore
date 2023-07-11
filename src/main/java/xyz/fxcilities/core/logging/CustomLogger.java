@@ -1,26 +1,14 @@
-package xyz.fxcilities.core.logging;
+package xyz.fxcilities.core.logging
 
-import xyz.fxcilities.core.Core;
+import xyz.fxcilities.core.Core
 
 /**
  * A custom logger
  *
- * @see Core#console
+ * @see Core.console
  */
-public class CustomLogger {
-    private BukkitLoggerOverride logger;
-    private Core plugin;
-
-    /**
-     * Creates a custom console logger
-     *
-     * @param plugin The core plugin
-     * @see BukkitLoggerOverride
-     */
-    public CustomLogger(Core plugin) {
-        this.logger = new BukkitLoggerOverride(plugin);
-        this.plugin = plugin;
-    }
+class CustomLogger(private val plugin: Core) {
+    private val logger: BukkitLoggerOverride = BukkitLoggerOverride(plugin)
 
     /**
      * Prints a message to console
@@ -28,13 +16,13 @@ public class CustomLogger {
      * @param prefix If the prefix should be sent before the text
      * @param text The text to log
      */
-    public void print(boolean prefix, String text) {
-        StringBuilder logRecord = new StringBuilder();
+    fun print(prefix: Boolean, text: String) {
+        val logRecord = StringBuilder()
         if (prefix) {
-            logRecord.append(plugin.getPrefix());
+            logRecord.append(plugin.prefix)
         }
-        logRecord.append(text);
-        logger.info(Chat.format(logRecord.toString()));
+        logRecord.append(text)
+        logger.info(Chat.format(logRecord.toString()))
     }
 
     /**
@@ -42,14 +30,14 @@ public class CustomLogger {
      *
      * @param text The text to log
      */
-    public void print(String text) {
-        print(false, text);
+    fun print(text: String) {
+        print(false, text)
     }
 
     /**
      * @return The Core plugin the logger belongs to
      */
-    public Core getPlugin() {
-        return this.plugin;
+    fun getPlugin(): Core {
+        return plugin
     }
 }
