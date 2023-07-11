@@ -1,22 +1,22 @@
-package xyz.fxcilities.core.placeholders.handlers;
+package xyz.fxcilities.core.placeholders.handlers
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Player
 
 /**
  * @see xyz.fxcilities.core.placeholders.PAPIExpansion
  */
-public interface ExtensionHandler {
+interface ExtensionHandler {
     /**
      * Called when a placeholder request is made
      *
      * @param player The player that requested the placeholder
-     * @param placeholder The placeholder that was requested, prefix not includes
+     * @param placeholder The placeholder that was requested, prefix not included
      * @return The result of the request
      */
-    String onRequest(Player player, String placeholder);
+    fun onRequest(player: Player, placeholder: String): String
 
     /**
      * @return The prefix of the extension
      */
-    String getPrefix();
+    fun getPrefix(): String
 }
