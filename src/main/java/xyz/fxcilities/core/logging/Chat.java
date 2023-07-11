@@ -1,75 +1,71 @@
-package xyz.fxcilities.core.logging;
+package xyz.fxcilities.core.logging
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import xyz.fxcilities.core.Core;
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
+import xyz.fxcilities.core.Core
 
 /** A utility class for sending chat messages to players */
-public class Chat {
+object Chat {
 
     /**
      * Formats a message
      *
-     * @param text String to format with chat colour codes (Replaces {@literal &} with the special
-     *     character)
+     * @param text String to format with chat colour codes (Replaces {@literal &} with the special character)
      * @return The formatted string
      */
-    public static String format(String text) {
-        return ChatColor.translateAlternateColorCodes('&', text);
+    fun format(text: String): String {
+        return ChatColor.translateAlternateColorCodes('&', text)
     }
 
     /**
-     * Send a messagge to a {@link CommandSender}. Will automatically format using {@link
-     * #format(String)}
+     * Send a message to a {@link CommandSender}. Will automatically format using {@link #format(String)}
      *
      * @param showPrefix If the prefix should be sent in the message
-     * @param sender Sender to send the message to. {@link Player} can be passed in, and everything
-     *     else that {@link CommandSender} (in this case {@link
-     *     org.bukkit.permissions.ServerOperator})
+     * @param sender Sender to send the message to. {@link Player} can be passed in, and everything else that
+     *     {@link CommandSender} (in this case {@link org.bukkit.permissions.ServerOperator})
      * @param text String of text to send
      */
-    public static void say(boolean showPrefix, CommandSender sender, String text) {
-        StringBuilder content = new StringBuilder();
+    fun say(showPrefix: Boolean, sender: CommandSender, text: String) {
+        val content = StringBuilder()
         if (showPrefix) {
-            content.append(Core.getInstance().getPrefix());
+            content.append(Core.getInstance().prefix)
         }
-        content.append(text);
-        sender.sendMessage(format(content.toString()));
+        content.append(text)
+        sender.sendMessage(format(content.toString()))
     }
 
     /**
-     * Sends a message to everyone online with a certainty permission
+     * Sends a message to everyone online with a certain permission
      *
      * @param permission The permission string to filter out
      * @param showPrefix If the prefix should be sent in the message
      * @param text Message to be sent.
      */
-    public static void say(String permission, boolean showPrefix, String text) {
-        StringBuilder content = new StringBuilder();
+    fun say(permission: String, showPrefix: Boolean, text: String) {
+        val content = StringBuilder()
         if (showPrefix) {
-            content.append(Core.getInstance().getPrefix());
+            content.append(Core.getInstance().prefix)
         }
-        content.append(text);
+        content.append(text)
 
-        String newText = format(content.toString());
+        val newText = format(content.toString())
 
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (player in Bukkit.getServer().onlinePlayers) {
             if (player.hasPermission(permission)) {
-                player.sendMessage(newText);
+                player.sendMessage(newText)
             }
         }
     }
 
     /**
-     * Sends a message to everyone online with a certainty permission
+     * Sends a message to everyone online with a certain permission
      *
      * @param permission The permission string to filter out
      * @param text Message to be sent.
      */
-    public static void say(String permission, String text) {
-        say(permission, true, text);
+    fun say(permission: String, text: String) {
+        say(permission, true, text)
     }
 }
