@@ -1,185 +1,148 @@
-package xyz.fxcilities.core.command;
+package xyz.fxcilities.core.command
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.entity.Player;
-
-import xyz.fxcilities.core.Core;
-import xyz.fxcilities.core.collections.expiringmap.ExpiringMap;
-import xyz.fxcilities.core.logging.Chat;
-
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import org.bukkit.command.CommandSender
+import org.bukkit.command.defaults.BukkitCommand
+import org.bukkit.entity.Player
+import xyz.fxcilities.core.Core
+import xyz.fxcilities.core.collections.expiringmap.ExpiringMap
+import xyz.fxcilities.core.logging.Chat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Represents a command for a server
  *
- * <p>Example:
+ * Example:
  *
- * <pre>{@code
- * public class MyCommand extends ServerCommand {
+ * ```
+ * class MyCommand : ServerCommand("hello", "says hello world", "/hello", true, listOf("helloworld", "world")) {
  *
- *     public MyCommand() {
- *         super("hello", "says hello world", "/hello", true, Arrays.asList("helloworld", "world")); // label, description, usage, playerOnly, aliases
- *
- *         // Optional
- *         setCooldownDuration(5, TimeUnit.SECONDS); // Five second cooldown, this line is optional.
+ *     init {
+ *         setCooldownDuration(5, TimeUnit.SECONDS) // Five second cooldown, this line is optional.
  *     }
  *
- *     @Override
- *     public void onCommand() {
- *         say("This is my command!"); // Sends a message to the player
- *         say(false, "&aHello world!"); // false to not show the prefix of the plugin. See {@link Core#getPrefix}
+ *     override fun onCommand() {
+ *         say("This is my command!") // Sends a message to the player
+ *         say(false, "&aHello world!") // false to not show the prefix of the plugin. See Core.getPrefix()
  *     }
  * }
- * }</pre>
+ * ```
  */
-public abstract class ServerCommand extends BukkitCommand {
+abstract class ServerCommand(
+    label: String,
+    description: String,
+    usage: String,
+    private val playerOnly: Boolean,
+    aliases: List<String> = emptyList()
+) : BukkitCommand(label, description, usage, aliases) {
 
-    private final boolean playerOnly;
-    protected CommandSender sender;
-    protected String[] args;
+    protected lateinit var sender: CommandSender
+    protected lateinit var args: Array<String>
 
-    public List<ServerSubCommand> subCommands = new ArrayList<>();
-    public List<String> tabCompleteArgs = new ArrayList<>();
+    val subCommands: MutableList<ServerSubCommand> = mutableListOf()
+    val tabCompleteArgs: MutableList<String> = mutableListOf()
 
-    private long cooldownDuration = 30;
-    private TimeUnit cooldownTimeUnit = TimeUnit.SECONDS;
+    private var cooldownDuration: Long = 30
+    private var cooldownTimeUnit: TimeUnit = TimeUnit.SECONDS
 
-    protected ExpiringMap<UUID, Long> cooldownMap =
-            ExpiringMap.builder().expiration(cooldownDuration, cooldownTimeUnit).build();
-
-    /**
-     * Create a server command. Registers when initialization of command.
-     *
-     * @param label This is the name of the command, and is what you type followed by slash in chat
-     * @param description The description of the command
-     * @param usage The usage message of a command. This never gets used because in {@link #execute}
-     *     it always returns true, but can be used manually
-     * @param playerOnly Set to true if you only want players to be able to run the command
-     * @param aliases A list of command aliases
-     * @see #onCommand
-     */
-    public ServerCommand(
-            String label,
-            String description,
-            String usage,
-            boolean playerOnly,
-            final List<String> aliases) {
-        super(label, description, usage, aliases);
-        this.playerOnly = playerOnly;
-        Core.getInstance().commands.add(this);
-    }
-
-    public ServerCommand(String label, String description, String usage, boolean playerOnly) {
-        this(label, description, usage, playerOnly, Collections.emptyList());
-    }
-
-    public ServerCommand(String label, boolean playerOnly) {
-        this(label, "", "/" + label, playerOnly, Collections.emptyList());
-    }
-
-    public ServerCommand(String label) {
-        this(label, false);
-    }
+    private val cooldownMap: ExpiringMap<UUID, Long> =
+        ExpiringMap.builder().expiration(cooldownDuration, cooldownTimeUnit).build()
 
     /**
-     * Registeres a sub command
+     * Register a sub command
      *
      * @param subCommand The sub command
      */
-    public void registerSub(ServerSubCommand subCommand) {
-        this.subCommands.add(subCommand);
+    fun registerSub(subCommand: ServerSubCommand) {
+        subCommands.add(subCommand)
     }
 
     /**
-     * This is an abstract function that is called whenever the command is run. Must be overrided.
+     * This is an abstract function that is called whenever the command is run. Must be overridden.
      */
-    public abstract void onCommand();
+    abstract fun onCommand()
 
-    public void setCooldownDuration(long duration, TimeUnit timeUnit) {
-        this.cooldownDuration = duration;
-        this.cooldownTimeUnit = timeUnit;
-        cooldownMap.setExpiration(cooldownDuration, cooldownTimeUnit);
+    fun setCooldownDuration(duration: Long, timeUnit: TimeUnit) {
+        cooldownDuration = duration
+        cooldownTimeUnit = timeUnit
+        cooldownMap.setExpiration(cooldownDuration, cooldownTimeUnit)
     }
 
     /**
-     * Adds arguments for tab completion.
+     * Add arguments for tab completion.
      *
      * @param args The arguments to add
      */
-    public void addTabCompleteArgs(String... args) {
-        this.tabCompleteArgs.addAll(Arrays.asList(args));
+    fun addTabCompleteArgs(vararg args: String) {
+        tabCompleteArgs.addAll(args)
     }
 
-    private String addPrefix(String message) {
-        return message.replace("{PREFIX}", Core.getInstance().getPrefix());
+    private fun addPrefix(message: String): String {
+        return message.replace("{PREFIX}", Core.getInstance().prefix)
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-        populate(sender, args);
+    override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
+        populate(sender, args)
 
-        if (playerOnly && !(sender instanceof Player)) {
-            return returnSay(false, addPrefix(Core.instance.notAPlayerMessage));
+        if (playerOnly && sender !is Player) {
+            return returnSay(false, addPrefix(Core.instance.notAPlayerMessage))
         }
 
         if (cooldownDuration > 0 && isPlayer()) {
-            Player player = (Player) this.sender;
+            val player = sender as Player
 
-            long lastCommandRun = cooldownMap.getOrDefault(player.getUniqueId(), 0L);
-            long difference =
-                    cooldownTimeUnit.convert(
-                            (System.currentTimeMillis() - lastCommandRun), TimeUnit.MILLISECONDS);
+            val lastCommandRun = cooldownMap.getOrDefault(player.uniqueId, 0L)
+            val difference = cooldownTimeUnit.convert(
+                (System.currentTimeMillis() - lastCommandRun), TimeUnit.MILLISECONDS
+            )
             if (difference <= cooldownDuration) {
-                String remainingTime =
-                        (cooldownDuration - difference) + formattedTimeUnit(cooldownTimeUnit);
-                return returnSay(
-                        false,
-                        addPrefix(Core.instance.onCooldownMessage)
-                                .replace("{TIME}", remainingTime));
+                val remainingTime = (cooldownDuration - difference).toString() + formattedTimeUnit(cooldownTimeUnit)
+                return returnSay(false, addPrefix(Core.instance.onCooldownMessage).replace("{TIME}", remainingTime))
             }
 
-            cooldownMap.put(player.getUniqueId(), System.currentTimeMillis());
+            cooldownMap.put(player.uniqueId, System.currentTimeMillis())
         }
 
-        if (args.length >= 1) {
-            for (ServerSubCommand subCommand : this.subCommands) {
-                if (subCommand.label.equalsIgnoreCase(args[0])
-                        || subCommand.aliases.contains(args[0].toLowerCase())) {
-                    subCommand.onCommand();
-                    return true;
+        if (args.size >= 1) {
+            for (subCommand in subCommands) {
+                if (subCommand.label.equals(args[0], ignoreCase = true) ||
+                    subCommand.aliases.contains(args[0].toLowerCase())
+                ) {
+                    subCommand.onCommand()
+                    return true
                 }
             }
         }
 
-        onCommand();
-        return true;
+        onCommand()
+        return true
     }
 
-    @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args)
-            throws IllegalArgumentException {
-        if (!(sender instanceof Player)) return null;
-        populate(sender, args);
+    override fun tabComplete(
+        sender: CommandSender,
+        alias: String,
+        args: Array<out String>
+    ): List<String>? {
+        if (sender !is Player) return null
+        populate(sender, args)
 
-        if (args.length == 1) {
-            List<String> tabComplete = new ArrayList<>();
-            for (ServerSubCommand subCommand : this.subCommands) {
+        if (args.size == 1) {
+            val tabComplete: MutableList<String> = ArrayList()
+            for (subCommand in subCommands) {
                 if (subCommand.label.startsWith(args[0]) || subCommand.aliases.contains(args[0])) {
-                    tabComplete.add(subCommand.label);
+                    tabComplete.add(subCommand.label)
                 }
-                if (subCommand.label.equalsIgnoreCase(args[0])) {
-                    tabComplete.addAll(subCommand.tabCompleteArgs);
+                if (subCommand.label.equals(args[0], ignoreCase = true)) {
+                    tabComplete.addAll(subCommand.tabCompleteArgs)
                 }
             }
 
-            tabComplete.add(getLabel());
-            tabComplete.addAll(this.tabCompleteArgs);
+            tabComplete.add(label)
+            tabComplete.addAll(tabCompleteArgs)
 
-            return tabComplete;
+            return tabComplete
         }
-        return Collections.emptyList();
+        return emptyList()
     }
 
     /**
@@ -188,51 +151,39 @@ public abstract class ServerCommand extends BukkitCommand {
      * @param withPrefix If the prefix should be sent before the message
      * @param message The message to send to the player
      */
-    protected void say(boolean withPrefix, String message) {
-        Chat.say(withPrefix, this.sender, message);
+    protected fun say(withPrefix: Boolean, message: String) {
+        Chat.say(withPrefix, sender, message)
     }
 
-    protected void say(String message) {
-        say(true, message);
+    protected fun say(message: String) {
+        say(true, message)
     }
 
-    protected final boolean isPlayer() {
-        return this.sender instanceof Player;
+    protected fun isPlayer(): Boolean {
+        return sender is Player
     }
 
-    public CommandSender getSender() {
-        return this.sender;
+    fun getSender(): CommandSender {
+        return sender
     }
 
-    private boolean returnSay(boolean withPrefix, String message) {
-        say(withPrefix, message);
-        return true; // To avoid the usage message being sent
+    private fun returnSay(withPrefix: Boolean, message: String): Boolean {
+        say(withPrefix, message)
+        return true // To avoid the usage message being sent
     }
 
-    private void populate(CommandSender sender, String[] args) {
-        this.sender = sender;
-        this.args = args;
+    private fun populate(sender: CommandSender, args: Array<out String>) {
+        this.sender = sender
+        this.args = args
     }
 
-    /**
-     * @author
-     *     http://www.java2s.com/example/java-utility-method/timeunit-convert/tostring-timeunit-unit-13d37.html
-     */
-    private String formattedTimeUnit(TimeUnit unit) {
-        switch (unit) {
-            case HOURS:
-            case DAYS:
-            case MINUTES:
-            case SECONDS:
-                return unit.toString().substring(0, 1).toLowerCase();
-            case MILLISECONDS:
-                return "ms";
-            case MICROSECONDS:
-                return "micros";
-            case NANOSECONDS:
-                return "ns";
-            default:
-                return "";
+    private fun formattedTimeUnit(unit: TimeUnit): String {
+        return when (unit) {
+            TimeUnit.HOURS, TimeUnit.DAYS, TimeUnit.MINUTES, TimeUnit.SECONDS -> unit.toString().substring(0, 1).toLowerCase()
+            TimeUnit.MILLISECONDS -> "ms"
+            TimeUnit.MICROSECONDS -> "micros"
+            TimeUnit.NANOSECONDS -> "ns"
+            else -> ""
         }
     }
 }
