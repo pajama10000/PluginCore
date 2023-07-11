@@ -10,6 +10,45 @@ A core for all my spigot plugins
 
 ### If you use gradle, add this.
 ```kotlin
+```repositories {
+      maven { url = "https://jitpack.io" }
+}
+
+dependencies {
+      implementation("com.github.Fxcilities:PluginCore:VERSION")
+}
+
+# If you use maven, add this.
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.Fxcilities</groupId>
+        <artifactId>PluginCore</artifactId>
+        <version>VERSION</version>
+    </dependency>
+</dependencies>```
+
+#m
+kotlin
+Copy code
+# PluginCore
+[![](https://img.shields.io/badge/dynamic/json?color=blue&label=JitPack&query=latestOk&url=https://jitpack.io/api/builds/com.github.Fxcilities/PluginCore/latest&style=for-the-badge)](https://jitpack.io/#Fxcilities/PluginCore)
+[![](https://img.shields.io/badge/dynamic/json?color=blue&label=JavaDoc&query=latestOk&url=https://jitpack.io/api/builds/com.github.Fxcilities/PluginCore/latest&style=for-the-badge)](https://javadoc.jitpack.io/com/github/Fxcilities/PluginCore/latest/javadoc/index.html)
+[![](https://img.shields.io/github/workflow/status/Fxcilities/PluginCore/Java%20CI%20with%20Gradle?color=blue&style=for-the-badge)](https://github.com/Fxcilities/PluginCore/actions)
+[![CodeFactor](https://www.codefactor.io/repository/github/fxcilities/plugincore/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/fxcilities/plugincore)
+
+A core for all my spigot plugins
+
+## Getting started
+
+### If you use gradle, add this.
+```kotlin
 repositories {
       maven { url = "https://jitpack.io" }
 }
@@ -17,9 +56,10 @@ repositories {
 dependencies {
       implementation("com.github.Fxcilities:PluginCore:VERSION")
 }
-If you use maven, add this.
-xml
-Copy code
+```
+# If you use maven, add this.
+
+```kotlin
 <repositories>
   <repository>
     <id>jitpack.io</id>
@@ -34,14 +74,15 @@ Copy code
         <version>VERSION</version>
     </dependency>
 </dependencies>
-If you use a dependency manager not listed, check the jitpack for more examples.
+```kotlin
+```
+# If you use a dependency manager not listed, check the jitpack for more examples.
 NOTE: Make sure to shadow the PluginCore dependency into your plugin build.
 Examples
 Basic plugin with a command
 MyPlugin.kt
 
-kotlin
-Copy code
+```kotlin
 class MyPlugin : Core() {
 
     override fun onPluginEnable() {
@@ -74,10 +115,10 @@ class MyPlugin : Core() {
         )
     }
 }
-MyCommand.kt
-
-kotlin
-Copy code
+```kotlin
+```
+# MyCommand.kt
+```kotlin
 class MyCommand : ServerCommand(
     "hello", "says hello world", "/hello", true, listOf("helloworld", "world")
 ) {
@@ -90,7 +131,10 @@ class MyCommand : ServerCommand(
         say(true, "&aHello world!") // true to show the prefix of the plugin
     }
 }
-Credit
-ExpiringMap
-PlayerScoreboard
-Some Ideas
+```kotlin
+```
+# Credit
+
+## ExpiringMap
+## PlayerScoreboard
+## Some Ideas
