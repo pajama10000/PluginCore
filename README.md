@@ -4,7 +4,8 @@
 [![](https://img.shields.io/github/workflow/status/Fxcilities/PluginCore/Java%20CI%20with%20Gradle?color=blue&style=for-the-badge)](https://github.com/Fxcilities/PluginCore/actions)
 [![CodeFactor](https://www.codefactor.io/repository/github/fxcilities/plugincore/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/fxcilities/plugincore)
 
-A core for all my spigot plugins
+# Made by Fxcil & pajama
+<h4>Kotlin made by pajama, java was written by fxcil</h4>
 
 ## Getting started
 
