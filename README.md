@@ -9,18 +9,17 @@ A core for all my spigot plugins
 ## Getting started
 
 ### If you use gradle, add this.
-```gradle
+```kotlin
 repositories {
-      maven { url 'https://jitpack.io' }
+      maven { url = "https://jitpack.io" }
 }
 
 dependencies {
-      implementation 'com.github.Fxcilities:PluginCore:VERSION'
+      implementation("com.github.Fxcilities:PluginCore:VERSION")
 }
-```
-### If you use maven, add this.
-
-```xml
+If you use maven, add this.
+xml
+Copy code
 <repositories>
   <repository>
     <id>jitpack.io</id>
@@ -35,77 +34,63 @@ dependencies {
         <version>VERSION</version>
     </dependency>
 </dependencies>
-```
+If you use a dependency manager not listed, check the jitpack for more examples.
+NOTE: Make sure to shadow the PluginCore dependency into your plugin build.
+Examples
+Basic plugin with a command
+MyPlugin.kt
 
-### If you use a dependency manager not listed, check the [jitpack](https://jitpack.io/#Fxcilities/PluginCore) for more examples.
-### NOTE: Make sure to shadow the PluginCore dependency into your plugin build.
+kotlin
+Copy code
+class MyPlugin : Core() {
 
-## Examples
-
-### Basic plugin with a command
-
-**MyPlugin.java**
-```java
-public final class MyPlugin extends Core {
-
-    @Override
-    public void onPluginEnable() {
-        console.print("Hello world!");
+    override fun onPluginEnable() {
+        console.print("Hello world!")
 
         // Initialize commands
-        new MyCommand();
+        MyCommand()
     }
 
-    @Override
-    public void onPluginDisable() {
-        console.print("Goodbye world!");
+    override fun onPluginDisable() {
+        console.print("Goodbye world!")
     }
 
-    @Override
-    public String getPrefix() {
-        return "&bMyPlugin > &f";
+    override fun getPrefix(): String {
+        return "&bMyPlugin > &f"
     }
 
-    @Override
-    public String getPluginVersion() {
-        return "v1.0";
+    override fun getPluginVersion(): String {
+        return "v1.0"
     }
 
-    @Override
-    public String getPluginName() {
-        return "MyPlugin";
+    override fun getPluginName(): String {
+        return "MyPlugin"
     }
 
-    @Override
-    public String[] getPluginAuthors() {
-        return new String[] {
+    override fun getPluginAuthors(): Array<String> {
+        return arrayOf(
             "Mario",
             "Luigi"
-        };
+        )
     }
 }
-```
-**MyCommand.java**
-```java
-public class MyCommand extends ServerCommand {
+MyCommand.kt
 
-    public MyCommand() {
-        super("hello", "says hello world", "/hello", true, Arrays.asList("helloworld", "world")); // label, description, usage, playerOnly, aliases
-
+kotlin
+Copy code
+class MyCommand : ServerCommand(
+    "hello", "says hello world", "/hello", true, listOf("helloworld", "world")
+) {
+    init {
         // Optional
-        setCooldownDuration(5, TimeUnit.SECONDS); // Five second cooldown
+        setCooldownDuration(5, TimeUnit.SECONDS) // Five second cooldown
     }
 
-    @Override
-    public void onCommand() {
-        say(true, "&aHello world!"); // true to show the prefix of the plugin
+    override fun onCommand() {
+        say(true, "&aHello world!") // true to show the prefix of the plugin
     }
 }
-```
-
-
-## Credit
-
-- [ExpiringMap](https://github.com/jhalterman/expiringmap)
-- [PlayerScoreboard](https://www.spigotmc.org/threads/scoreboard-api-1-8.160095/)
-- [Some Ideas](https://github.com/kangarko/Foundation)
+Credit
+ExpiringMap
+PlayerScoreboard
+Some Ideas
