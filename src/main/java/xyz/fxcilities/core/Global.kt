@@ -1,4 +1,4 @@
-package xyz.fxcilities.core
+package org.canadamc.core
 
 interface Global {
     companion object {
