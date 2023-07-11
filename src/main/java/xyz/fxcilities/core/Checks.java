@@ -1,25 +1,19 @@
-package xyz.fxcilities.core;
+package xyz.fxcilities.core
 
-import java.util.NoSuchElementException;
+import java.util.NoSuchElementException
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-/**
- * @author Fxcilities A better way of assertions
- */
-public class Checks {
+object Checks {
     /**
      * @param obj The object to check if null
      * @param name The name of the object (Example: "player")
      * @return Returns the obj parameter if not null
      * @throws IllegalArgumentException if the object is null
      */
-    public static <T> T nonNull(@Nullable T obj, @Nonnull String name) {
+    fun <T> nonNull(obj: T?, name: String): T {
         if (obj == null) {
-            throw new IllegalArgumentException(name + " cannot be null.");
+            throw IllegalArgumentException("$name cannot be null.")
         }
-        return obj;
+        return obj
     }
 
     /**
@@ -29,23 +23,27 @@ public class Checks {
      * @param name Name of the check
      * @throws RuntimeException if failed was true
      */
-    public static void check(boolean failed, String name) {
+    fun check(failed: Boolean, name: String) {
         if (failed) {
-            throw new RuntimeException(name);
+            throw RuntimeException(name)
         }
     }
 
     /**
-     * @author Jonathan Halterman Taken from ExpiringMap
+     * Taken from ExpiringMap by Jonathan Halterman
      */
-    public static void state(boolean expression, String errorMessageFormat, Object... args) {
-        if (!expression) throw new IllegalStateException(String.format(errorMessageFormat, args));
+    fun state(expression: Boolean, errorMessageFormat: String, vararg args: Any) {
+        if (!expression) {
+            throw IllegalStateException(String.format(errorMessageFormat, *args))
+        }
     }
 
     /**
-     * @author Jonathan Halterman Taken from ExpiringMap
+     * Taken from ExpiringMap by Jonathan Halterman
      */
-    public static void element(Object element, Object key) {
-        if (element == null) throw new NoSuchElementException(key.toString());
+    fun element(element: Any?, key: Any) {
+        if (element == null) {
+            throw NoSuchElementException(key.toString())
+        }
     }
 }
